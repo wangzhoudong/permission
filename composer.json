@@ -1,0 +1,23 @@
+{
+    "name": "simple-shop/permission",
+    "type": "library",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JiangZH",
+            "email": "j110021@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "database"
+        ],
+        "psr-4": {
+            "SimpleShop\\Permission\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
