@@ -12,6 +12,7 @@ namespace SimpleShop\Permission\Repositories;
 use Illuminate\Support\Collection;
 use \SimpleShop\Permission\Contracts\PermissionRepository as RepositoryInterface;
 use SimpleShop\Permission\Contracts\User;
+use SimpleShop\Permission\Models\Api;
 use SimpleShop\Permission\Models\Menu;
 use SimpleShop\Permission\Models\MenuApi;
 use SimpleShop\Permission\Models\Role;
@@ -82,5 +83,21 @@ class PermissionRepository implements RepositoryInterface
     protected function getUserImpl()
     {
         return App::make(User::class);
+    }
+
+    /**
+     * 获取设定了的route范围
+     *
+     * @param string $route
+     *
+     * @return Collection
+     */
+    public function getRouteScope($route = null)
+    {
+        if (! is_null($route)) {
+            return Api::where('path', $route)->pluck('path');
+        }
+
+        return Api::pluck('path');
     }
 }

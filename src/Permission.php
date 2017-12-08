@@ -49,4 +49,16 @@ class Permission
     {
         return $this->repo->getMenus();
     }
+
+    /**
+     * @param string $route
+     *
+     * @return bool
+     */
+    public function isRouteScope($route)
+    {
+        $route = $this->repo->getRouteScope($route);
+
+        return $route->isNotEmpty();
+    }
 }
