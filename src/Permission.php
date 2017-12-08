@@ -61,4 +61,35 @@ class Permission
 
         return $route->isNotEmpty();
     }
+
+    /**
+     *
+     *
+     * @param $userId
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function contrastRole($userId)
+    {
+        /** @var User $user */
+        $user = App::makeWith(User::class, ['user']);
+        if ($user->getIsUltimate()) {
+            return true;
+        }
+        $result = $this->repo->getSelfAndUserRole($userId);
+        $selfRoles = $result['self'];
+        $roles = $result['user'];
+
+        $flag = false;
+        foreach ($selfRoles as $selfRole) {
+            foreach ($roles as $role) {
+                if ($selfRole->deep < $role->deep && $selfRole->root_id === $role->root_id) {
+                    $flag = true;
+                }
+            }
+        }
+
+        return $flag;
+    }
 }

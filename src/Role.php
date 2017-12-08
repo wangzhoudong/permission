@@ -236,10 +236,20 @@ class Role
      * @param array $data
      *
      * @return mixed
+     * @throws \Exception
      */
     public function bindUser($userId, array $data)
     {
-        return $this->repo->bindUser($userId, $data);
+        // 检查要绑定的角色是不是比你等级高
+        $user = \Auth::user();
+        /** @var Permission $permission */
+        $permission = \App::makeWith(Permission::class, ['user' => $user]);
+        $bool = $permission->contrastRole($userId);
+        if ($bool) {
+            return $this->repo->bindUser($userId, $data);
+        }
+
+        throw new \Exception('你不能操作这个用户的角色');
     }
 
     /**

@@ -100,4 +100,29 @@ class PermissionRepository implements RepositoryInterface
 
         return Api::pluck('path');
     }
+
+    /**
+     * @param $userId
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getSelfAndUserRole($userId)
+    {
+        // 先查自己的权限
+        $userRoles = UserRole::where('user_id', $this->user->id)->pluck('role_id');
+
+        $selfRoles = Role::whereIn('id', $userRoles->all())->orderBy('deep')->get();
+
+        // 再去查要操作用户的权限
+        $userRoles = UserRole::where('user_id', $userId)->pluck('role_id');
+        $roles = Role::whereIn('id', $userRoles->all())->orderBy('deep')->get();
+
+
+
+        return [
+            'self' => $selfRoles,
+            'user' => $roles,
+        ];
+    }
 }
