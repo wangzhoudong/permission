@@ -102,4 +102,18 @@ class Menu extends Model
 
         return $query;
     }
+
+    /**
+     * 根据userId出数据
+     *
+     * @param $query
+     * @param $userId
+     *
+     * @return mixed
+     */
+    public function scopeUser($query, $userId)
+    {
+        return $query->join('role_menu', 'role_menu.menu_id', '=', $this->getTable() . '.id')->join('user_role', 'user_role.role_id', '=', 'role_menu.role_id')
+            ->where('user_role.user_id', $userId);
+    }
 }

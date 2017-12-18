@@ -13,14 +13,15 @@ use App\Exceptions\ResourcesNotFoundException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use SimpleShop\Permission\Contracts\RoleRepository as RepositoryInterface;
+use SimpleShop\Permission\Contracts\UserContract;
 use SimpleShop\Permission\Models\Menu;
 use SimpleShop\Permission\Models\Role;
 use App;
 use SimpleShop\Permission\Models\UserRole;
+use Auth;
 
 class RoleRepository implements RepositoryInterface
 {
-
     /**
      * 获取列表
      *
@@ -45,6 +46,8 @@ class RoleRepository implements RepositoryInterface
     }
 
     /**
+     * 获取集合
+     *
      * @param array $search
      * @param array $order
      * @param array $columns
@@ -99,6 +102,8 @@ class RoleRepository implements RepositoryInterface
     }
 
     /**
+     * 删除
+     *
      * @param $id
      *
      * @return mixed
@@ -146,6 +151,8 @@ class RoleRepository implements RepositoryInterface
     }
 
     /**
+     * 获取菜单
+     *
      * @param
      *
      * @return Collection
@@ -154,6 +161,18 @@ class RoleRepository implements RepositoryInterface
     {
         $menu = App::make(Menu::class);
         $role = App::make(Role::class);
+
+        $user = App::make(UserContract::class);
+
+        if (! $user->getIsUltimate()) {
+            $selfRoles = $role->join('user_role', 'user_role.role_id', '=', $role->getTable() . '.id')->where('user_role.user_id', Auth::user()->id)->get();
+            $result = $selfRoles->first(function ($item) {
+                return $item->name === '系统管理员';
+            });
+            if (is_null($result)) {
+                $menu = $menu->join('role_menu', 'role_menu.menu_id', '=', $menu->getTable() . '.id')->join('user_role', 'user_role.role_id', '=', 'role_menu.role_id')->where('user_role.user_id', Auth::user()->id);
+            }
+        }
 
         return $menu->with([
             'roles' => function ($query) use ($id, $role) {

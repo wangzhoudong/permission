@@ -10,7 +10,7 @@ namespace SimpleShop\Permission;
 
 
 use App\Exceptions\LoginException;
-use SimpleShop\Permission\Contracts\User as UserInterface;
+use SimpleShop\Permission\Contracts\UserContract as UserInterface;
 use Auth;
 
 /**

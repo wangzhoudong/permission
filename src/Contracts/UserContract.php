@@ -15,7 +15,7 @@ namespace SimpleShop\Permission\Contracts;
  * Interface User
  * @package SimpleShop\Permission\Contracts
  */
-interface User
+interface UserContract
 {
     /**
      * 获取id

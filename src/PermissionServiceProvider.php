@@ -15,7 +15,7 @@ use SimpleShop\Permission\Contracts\PermissionRepository;
 use SimpleShop\Permission\Contracts\RoleRepository;
 use SimpleShop\Permission\Repositories\MenuRepository as MenuRepositoryImpl;
 use SimpleShop\Permission\Repositories\RoleRepository as RoleRepositoryImpl;
-use SimpleShop\Permission\Contracts\User;
+use SimpleShop\Permission\Contracts\UserContract;
 use SimpleShop\Permission\User as UserImpl;
 use SimpleShop\Permission\Repositories\PermissionRepository as PermissionImpl;
 
@@ -37,7 +37,7 @@ class PermissionServiceProvider extends ServiceProvider
     {
         $this->app->singleton(MenuRepository::class, MenuRepositoryImpl::class);
         $this->app->singleton(RoleRepository::class, RoleRepositoryImpl::class);
-        $this->app->singleton(User::class, UserImpl::class);
+        $this->app->singleton(UserContract::class, UserImpl::class);
         $this->app->singleton(PermissionRepository::class, PermissionImpl::class);
     }
 
@@ -51,7 +51,7 @@ class PermissionServiceProvider extends ServiceProvider
         return [
             MenuRepository::class,
             RoleRepository::class,
-            User::class,
+            UserContract::class,
         ];
     }
 }

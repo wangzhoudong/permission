@@ -13,17 +13,21 @@ use App\Exceptions\LoginException;
 use App\Exceptions\ServiceErrorException;
 use Illuminate\Database\Eloquent\Model;
 use SimpleShop\Permission\Contracts\RoleRepository;
-use SimpleShop\Permission\Contracts\User;
+use SimpleShop\Permission\Contracts\UserContract;
 use DB;
-use SimpleShop\Permission\Models\Role as RoleModel;
+use Auth;
+use App;
 
 class Role
 {
     private $repo;
 
+    /**
+     * @var User
+     */
     private $user;
 
-    public function __construct(RoleRepository $roleRepository, User $user)
+    public function __construct(RoleRepository $roleRepository, UserContract $user)
     {
         $this->repo = $roleRepository;
         $this->user = $user;
@@ -241,10 +245,11 @@ class Role
     public function bindUser($userId, array $data)
     {
         // 检查要绑定的角色是不是比你等级高
-        $user = \Auth::user();
+        $user = Auth::user();
         /** @var Permission $permission */
-        $permission = \App::makeWith(Permission::class, ['user' => $user]);
-        $bool = $permission->contrastRole($userId);
+        $permission = App::makeWith(Permission::class, ['user' => $user]);
+        $bool = $permission->contrastRole($userId, $data);
+
         if ($bool) {
             return $this->repo->bindUser($userId, $data);
         }

@@ -63,17 +63,18 @@ class Permission
     }
 
     /**
+     * 对比角色
      *
-     *
-     * @param $userId
+     * @param       $userId
+     * @param array $data
      *
      * @return bool
      * @throws \Exception
      */
-    public function contrastRole($userId)
+    public function contrastRole($userId, array $data = [])
     {
         /** @var User $user */
-        $user = App::makeWith(User::class, ['user']);
+        $user = App::make(User::class);
         if ($user->getIsUltimate()) {
             return true;
         }
@@ -81,15 +82,51 @@ class Permission
         $selfRoles = $result['self'];
         $roles = $result['user'];
 
-        $flag = false;
+        $result = $selfRoles->first(function ($value) {
+            return $value->name === '系统管理员';
+        });
+
+        if (! is_null($result)) {
+            return true;
+        }
+
+        // 获取此次要改哪些角色
+        $tempRoles = $roles->pluck('id');
+        $changeRoles = $tempRoles->filter(function ($value) use ($data) {
+            return ! in_array($value, $data);
+        })->all();
+        $temp = array_diff($data, $tempRoles->toArray());
+        $changeRoles = array_merge($temp, $changeRoles);
+
+        // 检查要修改的角色是不是在自己的名单里
+        $check = $selfRoles->first(function ($value) use ($changeRoles) {
+            return in_array($value->id, $changeRoles);
+        });
+
+        if (is_null($check)) {
+            return false;
+        }
+
+        /*
+         * 判断当前这个人是否能修改对方的角色
+         * 过滤一下角色
+         */
+        $selfRoles = $selfRoles->filter(function ($value) use ($changeRoles){
+            return in_array($value->id, $changeRoles);
+        });
+
+        $roles = $roles->filter(function ($value) use ($changeRoles){
+            return in_array($value->id, $changeRoles);
+        });
+
         foreach ($selfRoles as $selfRole) {
             foreach ($roles as $role) {
-                if ($selfRole->deep < $role->deep && $selfRole->root_id === $role->root_id) {
-                    $flag = true;
+                if ($role->deep < $selfRole->deep && $role->root_id === $selfRole->root_id) {
+                    return false;
                 }
             }
         }
 
-        return $flag;
+        return true;
     }
 }

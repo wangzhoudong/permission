@@ -11,7 +11,7 @@ namespace SimpleShop\Permission\Repositories;
 
 use Illuminate\Support\Collection;
 use \SimpleShop\Permission\Contracts\PermissionRepository as RepositoryInterface;
-use SimpleShop\Permission\Contracts\User;
+use SimpleShop\Permission\Contracts\UserContract;
 use SimpleShop\Permission\Models\Api;
 use SimpleShop\Permission\Models\Menu;
 use SimpleShop\Permission\Models\MenuApi;
@@ -49,7 +49,7 @@ class PermissionRepository implements RepositoryInterface
         $menuApi = MenuApi::join('apis', function ($query) {
             $query->on('apis.id', '=', 'menu_api.api_id');
         })->whereIn('menu_api.menu_id', $roleMenu->all())->where('apis.path', $api)->where('apis.enable', 1)->pluck('path');
-
+        
         if ($menuApi->isNotEmpty()) {
             return true;
         }
@@ -78,11 +78,11 @@ class PermissionRepository implements RepositoryInterface
     }
 
     /**
-     * @return User
+     * @return UserContract
      */
     protected function getUserImpl()
     {
-        return App::make(User::class);
+        return App::make(UserContract::class);
     }
 
     /**
@@ -111,7 +111,6 @@ class PermissionRepository implements RepositoryInterface
     {
         // 先查自己的权限
         $userRoles = UserRole::where('user_id', $this->user->id)->pluck('role_id');
-
         $selfRoles = Role::whereIn('id', $userRoles->all())->orderBy('deep')->get();
 
         // 再去查要操作用户的权限
