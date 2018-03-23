@@ -19,7 +19,9 @@ class Menu
     public function __construct(MenuRepository $menuRepository)
     {
         $this->repo = $menuRepository;
+        
     }
+
 
     /**
      * 获取列表
