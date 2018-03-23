@@ -19,5 +19,12 @@
             "SimpleShop\\Permission\\": "src/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SimpleShop\\Permission\\PermissionServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "stable"
 }
